@@ -1,0 +1,12 @@
+/** @format */
+/** @format */
+
+@import "./styles/global.scss";
+
+:export {
+	clrAccentDefault: $clr-accent-default;
+	clrSecondaryDefault: $clr-secondary-default;
+	clrBackgroundDefault: $clr-background-default;
+
+	clrBackgroundLight: $clr-background-light;
+}

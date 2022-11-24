@@ -7,22 +7,41 @@ import {
 	Route,
 	Navigate,
 } from "react-router-dom";
+import { ThemeProvider } from "@mui/material/styles";
 import { Cookies, useCookies } from "react-cookie";
 import { Jellyfin } from "@jellyfin/sdk";
 import { v4 as uuidv4 } from "uuid";
 
+// Theming
+import { theme } from "./theme";
+import "./App.module.scss";
+
 import { version as appVer } from "../package.json";
-import reactLogo from "./assets/react.svg";
 import { ServerSetup as Server } from "./routes/setup/server/root";
 import { Home } from "./routes/home/root";
-import { version } from "react";
+
+// Fonts
+import "@fontsource/open-sans";
 
 function App() {
 	let cookie;
 	const [count, setCount] = useState(0);
-	const [serverlistCookies, setCookie, removeCookie] = useCookies([
-		"servers",
+	const [serverlistCookies] = useCookies(["servers"]);
+
+	const [jellyplayerCookies, setJellyplayerCookie] = useCookies([
+		"jellyplayer",
 	]);
+
+	const clientName = () => {
+		try {
+			if (jellyplayerCookies.clientInfo.name) {
+				return `Jellyplayer v${appVer}`;
+			}
+		} catch (error) {
+			setJellyplayerCookie("clientName", `Jellyplayer v${appVer}`);
+			return jellyplayerCookies.clientName;
+		}
+	};
 
 	const serverAvailable = () => {
 		try {
@@ -39,31 +58,36 @@ function App() {
 			version: appVer,
 		},
 		deviceInfo: {
-			name: "JellyPlayer Client",
+			name: clientName(),
 			id: uuidv4(),
 		},
 	});
 
 	return (
-		<Router>
-			<Routes>
-				{/* Main Routes */}
-				<Route path="/home" element={<Home />} />
-				<Route path="/setup/server" element={<Server />}></Route>
+		<ThemeProvider theme={theme}>
+			<Router>
+				<Routes>
+					{/* Main Routes */}
+					<Route path="/home" element={<Home />} />
+					<Route
+						path="/setup/server"
+						element={<Server />}
+					></Route>
 
-				{/* Logical Routes */}
-				<Route
-					path="/"
-					element={
-						serverAvailable() ? (
-							<Navigate to="/home" />
-						) : (
-							<Navigate to="/setup/server" />
-						)
-					}
-				/>
-			</Routes>
-		</Router>
+					{/* Logical Routes */}
+					<Route
+						path="/"
+						element={
+							serverAvailable() ? (
+								<Navigate to="/home" />
+							) : (
+								<Navigate to="/setup/server" />
+							)
+						}
+					/>
+				</Routes>
+			</Router>
+		</ThemeProvider>
 	);
 }
 
