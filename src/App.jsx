@@ -6,28 +6,25 @@ import {
 	Routes,
 	Route,
 	Navigate,
+	useNavigate,
 	Outlet,
 	useLocation,
 } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import { SnackbarProvider } from "notistack";
-import { motion, AnimatePresence } from "framer-motion";
 
-import { Cookies, useCookies } from "react-cookie";
-import { JellyfinContext } from "./jellyfin";
-import { Jellyfin } from "@jellyfin/sdk";
-import { v4 as uuidv4 } from "uuid";
+import { useCookies, Cookies } from "react-cookie";
+import { jellyfin } from "./jellyfin";
+import { getUserApi } from "@jellyfin/sdk/lib/utils/api/user-api";
 
 // Theming
 import { theme } from "./theme";
 import "./App.module.scss";
 
-import { version as appVer } from "../package.json";
-
 // Routes
 import { ServerSetup as Server } from "./routes/setup/server/root";
 import { Home } from "./routes/home/root";
-import { UserLogin } from "./routes/login/root";
+import { UserLogin, UserLoginManual } from "./routes/login/root";
 
 // Fonts
 import "@fontsource/open-sans";
@@ -57,32 +54,60 @@ const pageTransition = {
 
 function App() {
 	const [serverlistCookies] = useCookies(["servers"]);
-
-	const [jellyplayerCookies, setJellyplayerCookie] = useCookies([
-		"jellyplayer",
-	]);
-
-	const { JellyfinApi } = useContext(JellyfinContext);
-
-	const clientName = () => {
-		try {
-			if (jellyplayerCookies.clientInfo.name) {
-				return `Jellyplayer v${appVer}`;
-			}
-		} catch (error) {
-			setJellyplayerCookie("clientName", `Jellyplayer v${appVer}`);
-			return jellyplayerCookies.clientName;
-		}
-	};
-
-	JellyfinApi(appVer, clientName, uuidv4);
+	const [userCookies] = useCookies(["user"]);
+	const navigate = useNavigate();
+	const cookies = new Cookies();
 
 	const serverAvailable = () => {
 		try {
-			serverlistCookies.servers[0];
+			let currentServer = cookies.get("currentServer");
+			let currentServerIp = cookies.get(currentServer.ip);
 			return true;
 		} catch (error) {
 			return false;
+		}
+	};
+
+	const userSaved = () => {
+		try {
+			userCookies.user[0];
+			return true;
+		} catch (error) {
+			return false;
+		}
+	};
+
+	const userAvailable = async () => {
+		const cookies = new Cookies();
+
+		const currentServer = cookies.get("currentServer");
+		const currentServerIp = cookies.get(currentServer).ip;
+		const api = jellyfin.createApi(currentServerIp);
+		const users = await getUserApi(api).getPublicUsers();
+		try {
+			console.log("no of users" + users.data.length);
+			if (users.data.length >= 1) {
+				return true;
+			} else {
+				console.log("no of userswfw" + users.data.length);
+				return false;
+			}
+		} catch (error) {
+			return false;
+		}
+	};
+
+	const HandleLoginRoutes = () => {
+		if (userSaved()) {
+			navigate("/home");
+		} else {
+			userAvailable().then((res) => {
+				if (res) {
+					navigate("/login/users");
+				} else if (!res) {
+					navigate("/login/manual");
+				}
+			});
 		}
 	};
 
@@ -98,45 +123,52 @@ function App() {
 	return (
 		<SnackbarProvider maxSnack={5}>
 			<ThemeProvider theme={theme}>
-				<JellyfinContext.Provider value={{ JellyfinApi }}>
-					<div
-						className={`${transitionStage}`}
-						onAnimationEnd={() => {
-							if (transitionStage === "fadeOut") {
-								setTransistionStage("fadeIn");
-								setDisplayLocation(location);
-							}
-						}}
-					>
-						<Routes
-							location={location}
-							key={location.pathname}
-						>
-							{/* Main Routes */}
-							<Route path="/home" element={<Home />} />
-							<Route
-								path="/setup/server"
-								element={<Server />}
-							></Route>
-							<Route
-								path="/login"
-								element={<UserLogin />}
-							/>
+				<div
+					className={`${transitionStage}`}
+					onAnimationEnd={() => {
+						if (transitionStage === "fadeOut") {
+							setTransistionStage("fadeIn");
+							setDisplayLocation(location);
+						}
+					}}
+				>
+					<Routes location={location} key={location.pathname}>
+						{/* Main Routes */}
+						<Route path="/home" element={<Home />} />
+						<Route
+							path="/setup/server"
+							element={<Server />}
+						/>
+						<Route
+							path="/login/users"
+							element={<UserLogin />}
+						/>
+						<Route
+							path="/login/manual"
+							element={<UserLoginManual />}
+						/>
+						<Route path="/login/user/:user" />
 
-							{/* Logical Routes */}
-							<Route
-								path="/"
-								element={
-									serverAvailable() ? (
-										<Navigate to="/login" />
-									) : (
-										<Navigate to="/setup/server" />
-									)
-								}
-							/>
-						</Routes>
-					</div>
-				</JellyfinContext.Provider>
+						{/* Logical Routes */}
+						<Route
+							path="/login"
+							element={
+								<HandleLoginRoutes></HandleLoginRoutes>
+							}
+						/>
+
+						<Route
+							path="/"
+							element={
+								serverAvailable() ? (
+									<Navigate to="/login" />
+								) : (
+									<Navigate to="/setup/server" />
+								)
+							}
+						/>
+					</Routes>
+				</div>
 			</ThemeProvider>
 		</SnackbarProvider>
 	);

@@ -1,13 +1,11 @@
 /** @format */
 
 import { useState, useContext } from "react";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import { Navigate } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 
 // Importing Components
-
-// Jellyfin Api
-import { JellyfinContext } from "../../../jellyfin";
 
 // MUI
 import TextField from "@mui/material/TextField";
@@ -31,12 +29,15 @@ export const ServerSetup = (props) => {
 	const [checkingServer, setServerCheckState] = useState(false);
 	const [isJfServer, setIsJfServerState] = useState(false);
 
-	const { JellyfinApi } = useContext(JellyfinContext);
 	const { enqueueSnackbar } = useSnackbar();
 	const [serverlistCookies, setServerList] = useCookies(["servers"]);
 
-	const addServer = () => {
-		setServerList("servers", serverIp, { path: "/" });
+	const cookies = new Cookies();
+
+	const addServer = async () => {
+		let id = uuidv4();
+		setServerList(id, { ip: serverIp }, { path: "/" });
+		setServerList("currentServer", id, { path: "/" });
 		setIsJfServerState(true);
 	};
 
