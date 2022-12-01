@@ -1,10 +1,36 @@
 /** @format */
 
-.userImage {
-	aspect-ratio: 1;
-	width: 10em;
-	object-fit: cover;
+.user {
+	&List {
+		display: flex;
+		gap: 1em;
+		width: min(60vw, 45em);
+	}
+	&Card {
+		display: flex;
+		flex-flow: column;
+		flex: 1 1 0px;
+	}
+	&Image {
+		aspect-ratio: 1;
+		width: 100%;
+		object-fit: cover;
+		border-radius: $border-radius-cards;
+	}
+	&Icon {
+		font-size: 5em;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background: $clr-accent-dark;
+	}
 }
-.userList {
+
+.buttons {
 	display: flex;
+	gap: 1em;
+	width: 100%;
+	.userEventButton {
+		flex: 1 1 0 !important;
+	}
 }

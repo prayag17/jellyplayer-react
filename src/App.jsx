@@ -12,9 +12,9 @@ import {
 } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import { SnackbarProvider } from "notistack";
-
 import { useCookies, Cookies } from "react-cookie";
-import { jellyfin } from "./jellyfin";
+import { EventEmitter as event } from "./eventEmitter.cjs";
+
 import { getUserApi } from "@jellyfin/sdk/lib/utils/api/user-api";
 
 // Theming
@@ -22,47 +22,69 @@ import { theme } from "./theme";
 import "./App.module.scss";
 
 // Routes
-import { ServerSetup as Server } from "./routes/setup/server/root";
+import { ServerSetup, ServerList } from "./routes/setup/server/root";
 import { Home } from "./routes/home/root";
-import { UserLogin, UserLoginManual } from "./routes/login/root";
+import {
+	UserLogin,
+	LoginWithImage,
+	UserLoginManual,
+} from "./routes/login/root";
 
 // Fonts
 import "@fontsource/open-sans";
 
-const PageLayout = ({ children }) => children;
+// Jellyfin SDK TypeScript
+import { Jellyfin } from "@jellyfin/sdk";
+import { version as appVer } from "../package.json";
+import { v4 as uuidv4 } from "uuid";
 
-const pageVariants = {
-	initial: {
-		x: -100,
-		opacity: 0,
+const jellyfin = new Jellyfin({
+	clientInfo: {
+		name: "JellyPlayer",
+		version: appVer,
 	},
-	in: {
-		x: 0,
-		opacity: 1,
+	deviceInfo: {
+		name: "JellyPlayer",
+		id: uuidv4(),
 	},
-	out: {
-		x: 100,
-		opacity: 0,
-	},
-};
+});
 
-const pageTransition = {
-	type: "tween",
-	ease: "linear",
-	duration: 2,
-};
+event.on("create-jellyfin-api", (serverAddress) => {
+	window.api = jellyfin.createApi(serverAddress);
+	// window.api = jellyfin.createApi(serverAddress);
+});
+// event.on("get-jellyfin-api", () => {
+// console.log(window.api);
+// event.emit("jellyfin-api", window.api);
+// });
 
 function App() {
-	const [serverlistCookies] = useCookies(["servers"]);
 	const [userCookies] = useCookies(["user"]);
 	const navigate = useNavigate();
 	const cookies = new Cookies();
 
 	const serverAvailable = () => {
 		try {
-			let currentServer = cookies.get("currentServer");
-			let currentServerIp = cookies.get(currentServer.ip);
-			return true;
+			const currentServer = cookies.get("currentServer");
+			const serverList = cookies.get("servers");
+			console.log(serverList);
+			let currentServerIp = "";
+			serverList.map((item, index) => {
+				currentServerIp = item[currentServer];
+			});
+
+			if (currentServer == undefined) {
+				return false;
+			} else {
+				event.emit(
+					"create-jellyfin-api",
+					currentServerIp.serverAddress,
+				);
+				return true;
+			}
+
+			// console.log(cookies.getAll());
+			// return true;
 		} catch (error) {
 			return false;
 		}
@@ -78,18 +100,11 @@ function App() {
 	};
 
 	const userAvailable = async () => {
-		const cookies = new Cookies();
-
-		const currentServer = cookies.get("currentServer");
-		const currentServerIp = cookies.get(currentServer).ip;
-		const api = jellyfin.createApi(currentServerIp);
-		const users = await getUserApi(api).getPublicUsers();
+		const users = await getUserApi(window.api).getPublicUsers();
 		try {
-			console.log("no of users" + users.data.length);
 			if (users.data.length >= 1) {
 				return true;
 			} else {
-				console.log("no of userswfw" + users.data.length);
 				return false;
 			}
 		} catch (error) {
@@ -99,7 +114,7 @@ function App() {
 
 	const HandleLoginRoutes = () => {
 		if (userSaved()) {
-			navigate("/home");
+			navigate("/home/:userId");
 		} else {
 			userAvailable().then((res) => {
 				if (res) {
@@ -134,12 +149,22 @@ function App() {
 				>
 					<Routes location={location} key={location.pathname}>
 						{/* Main Routes */}
-						<Route path="/home" element={<Home />} />
+						<Route path="/home/:userId" element={<Home />} />
 						<Route
 							path="/setup/server"
-							element={<Server />}
+							element={<ServerSetup />}
 						/>
 						<Route
+							path="/servers/list"
+							element={<ServerList />}
+						/>
+						<Route
+							exact
+							path="/login/withImg/:userName/:userId/"
+							element={<LoginWithImage />}
+						/>
+						<Route
+							exact
 							path="/login/users"
 							element={<UserLogin />}
 						/>
@@ -147,10 +172,10 @@ function App() {
 							path="/login/manual"
 							element={<UserLoginManual />}
 						/>
-						<Route path="/login/user/:user" />
 
 						{/* Logical Routes */}
 						<Route
+							exact
 							path="/login"
 							element={
 								<HandleLoginRoutes></HandleLoginRoutes>

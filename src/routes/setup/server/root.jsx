@@ -1,17 +1,23 @@
 /** @format */
 
-import { useState, useContext } from "react";
+import { useState, useEffect } from "react";
 import { Cookies, useCookies } from "react-cookie";
 import { Navigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
+
+import { EventEmitter as event } from "../../../eventEmitter.cjs";
+import { getSystemApi } from "@jellyfin/sdk/lib/utils/api/system-api";
 
 // Importing Components
 
 // MUI
 import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
 import Button from "@mui/material/Button";
 import LinearProgress from "@mui/material/LinearProgress";
-import Slide from "@mui/material/Slide";
 import { useSnackbar } from "notistack";
 
 // Svgs
@@ -20,8 +26,99 @@ import { ReactComponent as JellyplayerLogo } from "../../../assets/logo.svg";
 // SCSS
 import "./server.module.scss";
 
-const SlideTransition = (props) => {
-	return <Slide {...props} direction="up" />;
+export const ServerList = () => {
+	const [renderServerList, setRenderServerList] = useState(false);
+	const [serverListRender, setServerListRender] = useState([]);
+	const cookies = new Cookies();
+
+	const currentServer = cookies.get("currentServer");
+	const serverList = cookies.get("servers");
+	let currentServerIp = "";
+	serverList.map((item, index) => {
+		currentServerIp = item[currentServer];
+		// console.log(item);
+	});
+
+	const createServerListRender = async () => {
+		let serverListKeys = [];
+		serverList.map((item, index) => {
+			serverListKeys.push(Object.keys(item));
+			// for (let item in servers) {
+			// if (item != "currentServer") {
+			// setServerList([...serverList, JSON.parse(servers[item])]);
+			// serverList.push(JSON.parse(servers[item]));
+			// }
+			// }
+		});
+		return serverListKeys;
+		// console.log(serverListRender);
+		// localStorage.setItem("servers", serverList);
+	};
+
+	const ServerList = (props) => {
+		const startRender = props.startRender;
+		if (startRender) {
+			return serverList.map((item, index) => {
+				let serverIndex = serverListRender[index];
+				let itm = item[serverIndex];
+				console.log(itm.serverAddress);
+				console.log("serverIndex : ", serverIndex);
+
+				return (
+					<div
+						key={index}
+						className="server"
+						style={{ color: "white" }}
+					>
+						{/* <Typography></Typography> */}
+						hello {itm.serverAddress} This is WIP
+					</div>
+				);
+			});
+		} else if (!startRender) {
+			return <h1>Hfjsi</h1>;
+		}
+	};
+	// const serverList = createServerList();
+	useEffect(() => {
+		createServerListRender().then((serverListKeys) => {
+			console.log("ServerListKeys : ", serverListKeys);
+			setServerListRender(serverListKeys);
+			setRenderServerList(true);
+		});
+		// console.log(serverList);
+	}, []);
+	return (
+		<>
+			<div className="centered">
+				<Typography color="textPrimary" variant="h3">
+					Select Server:
+				</Typography>
+				<div className="serverList">
+					<ServerList
+						startRender={renderServerList}
+					></ServerList>
+					{/* 
+					{serverList.map((item, index) => {
+						// let serverIndex = serverListRender[index];
+						// let itm = item[serverIndex];
+						// console.log(itm.serverAddress);
+						// console.log("serverIndex : ", serverIndex);
+						return (
+							// <></>
+							<div key={index} className="server">
+								hello{" "}
+								{
+									item[serverListRender[index]]
+										.serverAddress
+								}{" "}
+							</div>
+						);
+					})} */}
+				</div>
+			</div>
+		</>
+	);
 };
 
 export const ServerSetup = (props) => {
@@ -31,13 +128,33 @@ export const ServerSetup = (props) => {
 
 	const { enqueueSnackbar } = useSnackbar();
 	const [serverlistCookies, setServerList] = useCookies(["servers"]);
-
+	const [currentServer, setCurrentServer] = useCookies(["currentServer"]);
 	const cookies = new Cookies();
 
 	const addServer = async () => {
-		let id = uuidv4();
-		setServerList(id, { ip: serverIp }, { path: "/" });
-		setServerList("currentServer", id, { path: "/" });
+		event.emit("create-jellyfin-api", serverIp);
+		let sysInfo = await getSystemApi(window.api).getPublicSystemInfo();
+		sysInfo = sysInfo.data;
+		let initServerList = cookies.get("servers");
+		if (initServerList == null) {
+			initServerList = [];
+		} else {
+			initServerList = JSON.parse(initServerList);
+		}
+		console.log(initServerList);
+		let serverConf = {
+			serverName: sysInfo.ServerName,
+			id: sysInfo.Id,
+			jellyfinVersion: sysInfo.Version,
+			serverAddress: serverIp,
+		};
+		let jfId = sysInfo.Id;
+		let server = {};
+		server[sysInfo.Id] = serverConf;
+		server = JSON.stringify([...initServerList, server]);
+		console.log(server);
+		cookies.set("servers", server);
+		setCurrentServer("currentServer", sysInfo.Id, { path: "/" });
 		setIsJfServerState(true);
 	};
 
