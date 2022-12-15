@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Cookies, useCookies } from "react-cookie";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { EventEmitter as event } from "../../eventEmitter.cjs";
+import { EventEmitter as event } from "../../eventEmitter.js";
 
 // import Icon from "mdi-material-ui";
 import EyeOffOutline from "mdi-material-ui/EyeOffOutline";
@@ -61,25 +61,26 @@ export const LoginWithImage = () => {
 
 	const authUser = async () => {
 		try {
-			console.log(userName, password.password);
-
-			const auth = await window.api.authenticateUserByName(
+			const auth = await api.authenticateUserByName(
 				userName,
 				password.password,
 			);
 			return auth;
 		} catch (error) {
 			enqueueSnackbar("Incorrect Password!", { variant: "error" });
+			setLoading(false);
 			console.error(error);
 		}
 	};
 
 	const handleLogin = async () => {
 		setLoading(true);
-		const auth = await authUser();
-		console.log("Auth => ", auth);
+		const user = await authUser();
+		sessionStorage.setItem("accessToken", user.data.AccessToken);
+		event.emit("set-api-accessToken", currentServerIp.serverAddress);
+		// setAccessToken(user.data.AccessToken)
 		setLoading(false);
-		navigate(`/home/${auth.data.User.Id}`);
+		navigate(`/home`);
 	};
 
 	return (

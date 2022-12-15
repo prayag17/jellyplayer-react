@@ -13,7 +13,8 @@ import {
 import { ThemeProvider } from "@mui/material/styles";
 import { SnackbarProvider } from "notistack";
 import { useCookies, Cookies } from "react-cookie";
-import { EventEmitter as event } from "./eventEmitter.cjs";
+
+import { EventEmitter as event } from "./eventEmitter.js";
 
 import { getUserApi } from "@jellyfin/sdk/lib/utils/api/user-api";
 
@@ -50,13 +51,18 @@ const jellyfin = new Jellyfin({
 });
 
 event.on("create-jellyfin-api", (serverAddress) => {
-	window.api = jellyfin.createApi(serverAddress);
+	window.api = jellyfin.createApi(
+		serverAddress,
+		sessionStorage.getItem("accessToken"),
+	);
 	// window.api = jellyfin.createApi(serverAddress);
 });
-// event.on("get-jellyfin-api", () => {
-// console.log(window.api);
-// event.emit("jellyfin-api", window.api);
-// });
+event.on("set-api-accessToken", (serverAddress) => {
+	window.api = jellyfin.createApi(
+		serverAddress,
+		sessionStorage.getItem("accessToken"),
+	);
+});
 
 function App() {
 	const [userCookies] = useCookies(["user"]);
@@ -67,7 +73,6 @@ function App() {
 		try {
 			const currentServer = cookies.get("currentServer");
 			const serverList = cookies.get("servers");
-			console.log(serverList);
 			let currentServerIp = "";
 			serverList.map((item, index) => {
 				currentServerIp = item[currentServer];
@@ -76,15 +81,14 @@ function App() {
 			if (currentServer == undefined) {
 				return false;
 			} else {
-				event.emit(
-					"create-jellyfin-api",
-					currentServerIp.serverAddress,
-				);
+				if (!window.api) {
+					event.emit(
+						"create-jellyfin-api",
+						currentServerIp.serverAddress,
+					);
+				}
 				return true;
 			}
-
-			// console.log(cookies.getAll());
-			// return true;
 		} catch (error) {
 			return false;
 		}
@@ -149,7 +153,7 @@ function App() {
 				>
 					<Routes location={location} key={location.pathname}>
 						{/* Main Routes */}
-						<Route path="/home/:userId" element={<Home />} />
+						<Route path="/home" element={<Home />} />
 						<Route
 							path="/setup/server"
 							element={<ServerSetup />}

@@ -5,7 +5,7 @@ import { Cookies, useCookies } from "react-cookie";
 import { Navigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
-import { EventEmitter as event } from "../../../eventEmitter.cjs";
+import { EventEmitter as event } from "../../../eventEmitter.js";
 import { getSystemApi } from "@jellyfin/sdk/lib/utils/api/system-api";
 
 // Importing Components
@@ -141,7 +141,6 @@ export const ServerSetup = (props) => {
 		} else {
 			initServerList = JSON.parse(initServerList);
 		}
-		console.log(initServerList);
 		let serverConf = {
 			serverName: sysInfo.ServerName,
 			id: sysInfo.Id,
@@ -152,8 +151,7 @@ export const ServerSetup = (props) => {
 		let server = {};
 		server[sysInfo.Id] = serverConf;
 		server = JSON.stringify([...initServerList, server]);
-		console.log(server);
-		cookies.set("servers", server);
+		setServerList("servers", server, { path: "/" });
 		setCurrentServer("currentServer", sysInfo.Id, { path: "/" });
 		setIsJfServerState(true);
 	};
@@ -183,7 +181,7 @@ export const ServerSetup = (props) => {
 			.catch((error) => {
 				setServerCheckState(false);
 				enqueueSnackbar(
-					"The server address does not seem be a jellyfin server",
+					"Unable to verify whether the give address is a valid Jellyfin server",
 					{ variant: "error" },
 				);
 				console.error(error);
