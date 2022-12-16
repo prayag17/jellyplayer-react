@@ -4,6 +4,8 @@ import { createTheme } from "@mui/material/styles";
 import {
 	clrAccentDefault,
 	clrBackgroundDefault,
+	clrBackgroundDark,
+	clrBackgroundLight,
 	clrSecondaryDefault,
 } from "./palette.module.scss";
 
@@ -11,7 +13,11 @@ export const theme = createTheme({
 	palette: {
 		primary: {
 			main: clrAccentDefault,
-			background: clrBackgroundDefault,
+			background: {
+				main: clrBackgroundDefault,
+				light: clrBackgroundLight,
+				dark: clrBackgroundDark,
+			},
 		},
 		secondary: {
 			main: clrSecondaryDefault,
