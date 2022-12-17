@@ -20,7 +20,7 @@ import { getUserApi } from "@jellyfin/sdk/lib/utils/api/user-api";
 
 // Theming
 import { theme } from "./theme";
-import "./App.module.scss";
+import "./styles/global.scss";
 
 // Routes
 import { ServerSetup, ServerList } from "./routes/setup/server/root";

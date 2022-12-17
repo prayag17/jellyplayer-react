@@ -2,14 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { Cookies } from "react-cookie";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams, Link, Await } from "react-router-dom";
 
 import { EventEmitter as event } from "../../eventEmitter.js";
 
 import { theme } from "../../theme";
+import "./home.module.scss";
 
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
+import Skeleton from "@mui/material/Skeleton";
 import Button from "@mui/material/Button";
 import MuiAppBar from "@mui/material/AppBar";
 import MuiDrawer from "@mui/material/Drawer";
@@ -22,6 +24,9 @@ import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Divider from "@mui/material/Divider";
 import Avatar from "@mui/material/Avatar";
+import Paper from "@mui/material/Paper";
+
+import Carousel from "react-material-ui-carousel";
 
 import MenuIcon from "mdi-material-ui/Menu";
 import Close from "mdi-material-ui/Close";
@@ -33,6 +38,7 @@ import FolderOutline from "mdi-material-ui/FolderOutline";
 
 import { getLibraryApi } from "@jellyfin/sdk/lib/utils/api/library-api";
 import { getUserApi } from "@jellyfin/sdk/lib/utils/api/user-api";
+import { getUserLibraryApi } from "@jellyfin/sdk/lib/utils/api/user-library-api";
 import { Typography } from "@mui/material";
 
 const drawerWidth = 320;
@@ -114,10 +120,15 @@ const MediaTypeIconCollection = {
 };
 
 export const Home = () => {
+	const [skeletonStateSideMenu, setSkeletonStateSideMenu] = useState(false);
+	const [skeletonStateCarousel, setSkeletonStateCarousel] = useState(false);
+
 	const [userLibraries, setUserLibraries] = useState([]);
 	const [user, setUser] = useState({
 		Name: "",
 	});
+	const [latestMedia, setLatestMedia] = useState([]);
+
 	const [drawerState, setDrawerState] = useState(false);
 	const cookies = new Cookies();
 
@@ -134,22 +145,35 @@ export const Home = () => {
 		console.log("logged out user");
 	};
 
-	const userLibs = async () => {
-		const userLibs = await getLibraryApi(window.api).getMediaFolders();
-		return userLibs;
-	};
-
 	const currentUser = async () => {
 		const user = await getUserApi(window.api).getCurrentUser();
 		return user;
 	};
 
+	const userLibs = async (user) => {
+		const userLibs = await getLibraryApi(window.api).getMediaFolders();
+		return userLibs;
+	};
+
+	const getLatestMedia = async (user) => {
+		const media = await getUserLibraryApi(window.api).getLatestMedia({
+			userId: user.Id,
+			fields: "Overview",
+		});
+		return media;
+	};
+
 	useEffect(() => {
 		currentUser().then((usr) => {
 			setUser(usr.data);
-		});
-		userLibs().then((libs) => {
-			setUserLibraries(libs.data.Items);
+			userLibs(usr.data).then((libs) => {
+				setUserLibraries(libs.data.Items);
+				setSkeletonStateSideMenu(true);
+			});
+			getLatestMedia(usr.data).then((media) => {
+				setLatestMedia(media.data);
+				setSkeletonStateCarousel(true);
+			});
 		});
 	});
 
@@ -199,9 +223,9 @@ export const Home = () => {
 						{/* <div>
 						<Avatar src={""}/>
 						<Typography variant="h3">
-							{user["Name"]}
+						{user["Name"]}
 						</Typography>
-						</div> */}
+					</div> */}
 						<IconButton
 							onClick={handleDrawerClose}
 							sx={{
@@ -214,54 +238,203 @@ export const Home = () => {
 						</IconButton>
 					</DrawerHeader>
 					<Divider />
-					<List sx={{ border: "none" }}>
-						{userLibraries.map((library, index) => {
-							return (
-								<ListItem disablePadding key={index}>
-									<ListItemButton
-										sx={{
-											minHeight: 48,
-											justifyContent:
-												drawerState
-													? "initial"
-													: "center",
-											px: 2.5,
-										}}
+					{skeletonStateSideMenu ? (
+						<List sx={{ border: "none" }}>
+							{userLibraries.map((library, index) => {
+								return (
+									<ListItem
+										disablePadding
+										key={index}
 									>
-										<ListItemIcon
+										<ListItemButton
 											sx={{
-												minWidth: 0,
-												mr: drawerState
-													? 3
-													: "auto",
+												minHeight: 48,
 												justifyContent:
-													"center",
+													drawerState
+														? "initial"
+														: "center",
+												px: 2.5,
 											}}
 										>
-											{
-												MediaTypeIconCollection[
-													library
-														.CollectionType
-												]
-											}
-										</ListItemIcon>
-										<ListItemText
-											primary={library.Name}
-											sx={{
-												opacity: drawerState
-													? 1
-													: 0,
-											}}
-										/>
-									</ListItemButton>
-								</ListItem>
-							);
-						})}
-					</List>
+											<ListItemIcon
+												sx={{
+													minWidth: 0,
+													mr: drawerState
+														? 3
+														: "auto",
+													justifyContent:
+														"center",
+												}}
+											>
+												{
+													MediaTypeIconCollection[
+														library
+															.CollectionType
+													]
+												}
+											</ListItemIcon>
+											<ListItemText
+												primary={
+													library.Name
+												}
+												sx={{
+													opacity: drawerState
+														? 1
+														: 0,
+												}}
+											/>
+										</ListItemButton>
+									</ListItem>
+								);
+							})}
+						</List>
+					) : (
+						<>
+							<Skeleton
+								height={50}
+								variant="rectangular"
+								animation="wave"
+							></Skeleton>
+							<br />
+							<Skeleton
+								height={50}
+								variant="rectangular"
+								animation="wave"
+							></Skeleton>
+							<br />
+							<Skeleton
+								height={50}
+								variant="rectangular"
+								animation="wave"
+							></Skeleton>
+						</>
+					)}
 				</Drawer>
 				{/* <h1>Hey {userId} this is WIP Home</h1> */}
-				<Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+				<Box
+					component="main"
+					className="scrollY"
+					sx={{ flexGrow: 1, p: 3 }}
+				>
 					<DrawerHeader />
+					<Carousel
+						className="hero-carousel"
+						autoPlay={true}
+						animation="fade"
+						height="70vh"
+						IndicatorIcon={
+							<div className="hero-carousel-indicator"></div>
+						}
+						activeIndicatorIconButtonProps={{
+							style: {
+								background: "rgb(255 255 255)",
+							},
+						}}
+						indicatorIconButtonProps={{
+							style: {
+								background: "rgb(255 255 255 / 0.3)",
+								borderRadius: "2px",
+								width: "100%",
+								flexShrink: "1",
+							},
+						}}
+						indicatorContainerProps={{
+							style: {
+								display: "flex",
+								gap: "1em",
+							},
+						}}
+						sx={{
+							marginBottom: "1.5em",
+						}}
+						interval={10000}
+					>
+						{skeletonStateCarousel ? (
+							latestMedia.map((item, index) => {
+								return (
+									<Paper
+										className="hero-carousel-slide"
+										sx={{
+											background:
+												theme.palette
+													.primary
+													.background
+													.dark,
+										}}
+										key={index}
+									>
+										<div
+											className="hero-carousel-background"
+											style={{
+												backgroundImage: `url(${
+													window.api
+														.basePath +
+													"/Items/" +
+													item.Id +
+													"/Images/Backdrop"
+												})`,
+											}}
+										></div>
+										<Box className="hero-carousel-detail">
+											<Typography
+												variant="h3"
+												className="hero-carousel-text"
+											>
+												{item.Name}
+											</Typography>
+											<Typography
+												variant="subtitle1"
+												className="hero-carousel-text"
+											>
+												{item.Overview}
+											</Typography>
+										</Box>
+									</Paper>
+								);
+							})
+						) : (
+							<Paper
+								className="hero-carousel-slide"
+								sx={{
+									background:
+										theme.palette.primary
+											.background.dark,
+								}}
+							>
+								<div className="hero-carousel-background">
+									<Skeleton
+										variant="rectangular"
+										height="100%"
+										animation="wave"
+									></Skeleton>
+								</div>
+								<Box className="hero-carousel-detail">
+									<Typography
+										variant="h3"
+										className="hero-carousel-text"
+									>
+										<Skeleton
+											variant="text"
+											sx={{ fontSize: "5rem" }}
+											width={300}
+											animation="wave"
+										></Skeleton>
+									</Typography>
+									<Typography
+										variant="p"
+										className="hero-carousel-text"
+									>
+										<Skeleton
+											variant="text"
+											sx={{ fontSize: "3rem" }}
+											width={400}
+											animation="wave"
+										></Skeleton>
+									</Typography>
+								</Box>
+							</Paper>
+						)}
+					</Carousel>
 					<Button variant="contained" onClick={handleLogout}>
 						Logout
 					</Button>

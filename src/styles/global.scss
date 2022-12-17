@@ -1,16 +1,4 @@
 /** @format */
-
-$clr-accent-default: hsl(337, 96%, 56%);
-$clr-accent-dark: hsl(337, 96%, 10%);
-$clr-secondary-default: hsl(273, 100%, 22%);
-$clr-background-default: hsl(256, 100%, 6%);
-
-$clr-background-dark: hsl(256, 100%, 4%);
-$clr-background-light: hsl(256, 100%, 16%);
-
-$border-radius-cards: 10px;
-
-/** @format */
 body {
 	font-family: "Open Sans";
 	background: $clr-background-default;
@@ -26,6 +14,7 @@ body {
 .fadeOut {
 	height: 100vh;
 	width: 100vw;
+	overflow: hidden;
 }
 
 .centered {
@@ -71,4 +60,8 @@ body {
 
 h1 {
 	color: white !important;
+}
+
+.scrollY {
+	overflow-y: auto;
 }
