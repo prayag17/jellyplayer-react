@@ -8,8 +8,6 @@ import { v4 as uuidv4 } from "uuid";
 import { EventEmitter as event } from "../../../eventEmitter.js";
 import { getSystemApi } from "@jellyfin/sdk/lib/utils/api/system-api";
 
-// Importing Components
-
 // MUI
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
@@ -190,7 +188,6 @@ export const ServerSetup = (props) => {
 
 	return (
 		<>
-			{/* <jellyfin.Consumer> */}
 			{checkingServer && <LinearProgress />}
 			{isJfServer && <Navigate to="/login" />}
 			<div
@@ -219,7 +216,6 @@ export const ServerSetup = (props) => {
 					Add Server
 				</Button>
 			</div>
-			{/* </jellyfin.Consumer> */}
 		</>
 	);
 };

@@ -1,0 +1,29 @@
+/** @format */
+
+.card {
+	&.square {
+		width: fit-content;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-direction: column;
+		gap: 0.5em;
+		margin-bottom: 0.5em;
+	}
+	&-image {
+		&-container {
+			font-size: 5em;
+		}
+		&-icon {
+			font-size: 1.5em !important;
+			&-container {
+				width: 1.5em;
+				height: 1.5em;
+				aspect-ratio: 1;
+				border-radius: $border-radius-default;
+				color: $clr-accent-default;
+				background: $clr-accent-dark;
+			}
+		}
+	}
+}

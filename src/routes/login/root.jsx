@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Cookies, useCookies } from "react-cookie";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { EventEmitter as event } from "../../eventEmitter.js";
+import { motion } from "framer-motion";
 
 // import Icon from "mdi-material-ui";
 import EyeOffOutline from "mdi-material-ui/EyeOffOutline";
@@ -20,6 +21,8 @@ import Avatar from "@mui/material/Avatar";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Button from "@mui/material/Button";
 import { useSnackbar } from "notistack";
+
+import { AvatarCard } from "../../components/avatar/avatar.jsx";
 
 // import { jellyfin } from "../../jellyfin";
 // import getSystemApi from "@jellyfin/sdk";
@@ -189,7 +192,20 @@ export const UserLogin = () => {
 								className="userCard"
 								index={index}
 							>
-								<Avatar
+								{item.ImageTags == undefined ? (
+									<AvatarCard
+										userName={item.Name}
+										userId={item.Id}
+										userImageAvailable={false}
+									></AvatarCard>
+								) : (
+									<AvatarCard
+										userName={item.Name}
+										userImageAvailable={true}
+									></AvatarCard>
+								)}
+								{/* <Avatar
+									alt={item.Name}
 									src={
 										currentServerIp.serverAddress +
 										"/Users/" +
@@ -209,7 +225,7 @@ export const UserLogin = () => {
 									color="textPrimary"
 								>
 									{item.Name}
-								</Typography>
+								</Typography> */}
 							</Link>
 						);
 					})}
@@ -231,7 +247,6 @@ export const UserLogin = () => {
 					</Button>
 				</div>
 			</div>
-			{/* <h1>{...serversListCookies}</h1> */}
 		</>
 	);
 };

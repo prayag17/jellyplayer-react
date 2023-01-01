@@ -12,20 +12,52 @@
 		margin: 0 auto;
 	}
 	&-background {
-		position: absolute;
-		z-index: 0;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background-size: cover;
-		mask-image: linear-gradient(to right, transparent 20%, black 50%);
-		-webkit-mask-image: linear-gradient(
-			to right,
-			transparent 20%,
-			rgb(0 0 0 / 0.5) 50%,
-			black 90%
-		);
+		&-container {
+			position: absolute;
+			z-index: 0;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			mask-image: linear-gradient(
+				to right,
+				transparent 20%,
+				black 50%
+			);
+			-webkit-mask-image: linear-gradient(
+				to right,
+				transparent 20%,
+				rgb(0 0 0 / 0.5) 50%,
+				black 90%
+			);
+		}
+		&-image {
+			position: absolute;
+			background-size: cover;
+			z-index: 0;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+		}
+		&-icon {
+			position: absolute;
+			font-size: 10em !important;
+			left: 70%;
+			top: 50%;
+			transform: translate(-50%, -50%);
+			color: $clr-accent-default;
+
+			&-container {
+				position: absolute;
+				background: $clr-accent-dark;
+				z-index: 0;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+			}
+		}
 	}
 	&-text {
 		display: -webkit-box;

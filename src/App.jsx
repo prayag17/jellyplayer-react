@@ -1,18 +1,18 @@
 /** @format */
 
 import { useState, useEffect, useContext } from "react";
+import { ThemeProvider } from "@mui/material/styles";
+import { SnackbarProvider } from "notistack";
+import { useCookies, Cookies } from "react-cookie";
 import {
-	BrowserRouter as Router,
 	Routes,
 	Route,
 	Navigate,
 	useNavigate,
-	Outlet,
 	useLocation,
+	Outlet,
 } from "react-router-dom";
-import { ThemeProvider } from "@mui/material/styles";
-import { SnackbarProvider } from "notistack";
-import { useCookies, Cookies } from "react-cookie";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { EventEmitter as event } from "./eventEmitter.js";
 
@@ -63,6 +63,38 @@ event.on("set-api-accessToken", (serverAddress) => {
 		sessionStorage.getItem("accessToken"),
 	);
 });
+
+const anim = {
+	initial: {
+		opacity: 0,
+		x: -50,
+	},
+	animate: {
+		opacity: 1,
+		x: 0,
+	},
+	exit: {
+		opacity: 0,
+		x: 50,
+	},
+};
+
+const AnimationWrapper = () => {
+	return (
+		<motion.div
+			className="root-page"
+			variants={anim}
+			initial="initial"
+			animate="animate"
+			exit="exit"
+			transition={{
+				duration: 0.2,
+			}}
+		>
+			<Outlet />
+		</motion.div>
+	);
+};
 
 function App() {
 	const [userCookies] = useCookies(["user"]);
@@ -118,7 +150,7 @@ function App() {
 
 	const HandleLoginRoutes = () => {
 		if (userSaved()) {
-			navigate("/home/:userId");
+			navigate("/home");
 		} else {
 			userAvailable().then((res) => {
 				if (res) {
@@ -132,72 +164,59 @@ function App() {
 
 	const location = useLocation();
 
-	const [displayLocation, setDisplayLocation] = useState(location);
-	const [transitionStage, setTransistionStage] = useState("fadeIn");
-
-	useEffect(() => {
-		if (location !== displayLocation) setTransistionStage("fadeOut");
-	}, [location, displayLocation]);
-
 	return (
 		<SnackbarProvider maxSnack={5}>
 			<ThemeProvider theme={theme}>
-				<div
-					className={`${transitionStage}`}
-					onAnimationEnd={() => {
-						if (transitionStage === "fadeOut") {
-							setTransistionStage("fadeIn");
-							setDisplayLocation(location);
-						}
-					}}
-				>
-					<Routes location={location} key={location.pathname}>
-						{/* Main Routes */}
-						<Route path="/home" element={<Home />} />
-						<Route
-							path="/setup/server"
-							element={<ServerSetup />}
-						/>
-						<Route
-							path="/servers/list"
-							element={<ServerList />}
-						/>
-						<Route
-							exact
-							path="/login/withImg/:userName/:userId/"
-							element={<LoginWithImage />}
-						/>
-						<Route
-							exact
-							path="/login/users"
-							element={<UserLogin />}
-						/>
-						<Route
-							path="/login/manual"
-							element={<UserLoginManual />}
-						/>
+				<AnimatePresence wait>
+					<Routes key={location.pathname} location={location}>
+						<Route element={<AnimationWrapper />}>
+							{/* Main Routes */}
+							<Route path="/home" element={<Home />} />
+							<Route
+								path="/setup/server"
+								element={<ServerSetup />}
+							/>
+							<Route
+								path="/servers/list"
+								element={<ServerList />}
+							/>
+							<Route
+								exact
+								path="/login/withImg/:userName/:userId/"
+								element={<LoginWithImage />}
+							/>
+							<Route
+								exact
+								path="/login/users"
+								element={<UserLogin />}
+							/>
+							<Route
+								path="/login/manual"
+								element={<UserLoginManual />}
+							/>
 
-						{/* Logical Routes */}
-						<Route
-							exact
-							path="/login"
-							element={
-								<HandleLoginRoutes></HandleLoginRoutes>
-							}
-						/>
+							{/* Logical Routes */}
+							<Route
+								exact
+								path="/login"
+								element={
+									<HandleLoginRoutes></HandleLoginRoutes>
+								}
+							/>
 
-						<Route
-							path="/"
-							element={
-								serverAvailable() ? (
-									<Navigate to="/login" />
-								) : (
-									<Navigate to="/setup/server" />
-								)
-							}
-						/>
+							<Route
+								path="/"
+								element={
+									serverAvailable() ? (
+										<Navigate to="/login" />
+									) : (
+										<Navigate to="/setup/server" />
+									)
+								}
+							/>
+						</Route>
 					</Routes>
-				</div>
+				</AnimatePresence>
 			</ThemeProvider>
 		</SnackbarProvider>
 	);

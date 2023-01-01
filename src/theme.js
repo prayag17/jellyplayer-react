@@ -27,4 +27,13 @@ export const theme = createTheme({
 	typography: {
 		fontFamily: "Open Sans",
 	},
+	components: {
+		MuiButton: {
+			styleOverrides: {
+				root: {
+					borderRadius: "100px",
+				},
+			},
+		},
+	},
 });

@@ -10,8 +10,7 @@ body {
 }
 
 #root,
-.fadeIn,
-.fadeOut {
+.root-page {
 	height: 100vh;
 	width: 100vw;
 	overflow: hidden;
@@ -64,4 +63,6 @@ h1 {
 
 .scrollY {
 	overflow-y: auto;
+	height: 100vh;
+	box-sizing: border-box;
 }

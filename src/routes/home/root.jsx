@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Cookies } from "react-cookie";
 import { useNavigate, useParams, Link, Await } from "react-router-dom";
+import { motion } from "framer-motion";
 
 import { EventEmitter as event } from "../../eventEmitter.js";
 
@@ -23,23 +24,26 @@ import ListItemButton from "@mui/material/ListItemButton";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Divider from "@mui/material/Divider";
-import Avatar from "@mui/material/Avatar";
 import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import useScrollTrigger from "@mui/material/useScrollTrigger";
 
 import Carousel from "react-material-ui-carousel";
 
+// Custom Components
+import { CardLandscape } from "../../components/card";
+
+// Icons
+import {
+	MediaCollectionTypeIconCollection,
+	MediaTypeIconCollection,
+} from "../../components/utils/iconsCollection.jsx";
 import MenuIcon from "mdi-material-ui/Menu";
 import Close from "mdi-material-ui/Close";
-import MovieOutline from "mdi-material-ui/MovieOutline";
-import MusicBoxMultipleOutline from "mdi-material-ui/MusicBoxMultipleOutline";
-import PlaylistMusicOutline from "mdi-material-ui/PlaylistMusicOutline";
-import Television from "mdi-material-ui/Television";
-import FolderOutline from "mdi-material-ui/FolderOutline";
 
 import { getLibraryApi } from "@jellyfin/sdk/lib/utils/api/library-api";
 import { getUserApi } from "@jellyfin/sdk/lib/utils/api/user-api";
 import { getUserLibraryApi } from "@jellyfin/sdk/lib/utils/api/user-library-api";
-import { Typography } from "@mui/material";
 
 const drawerWidth = 320;
 
@@ -99,7 +103,7 @@ const AppBar = styled(MuiAppBar, {
 		easing: theme.transitions.easing.sharp,
 		duration: theme.transitions.duration.leavingScreen,
 	}),
-	backgroundColor: theme.palette.primary.background.dark,
+	backgroundColor: "transparent",
 	backgroundImage: "none",
 	...(open && {
 		marginLeft: drawerWidth,
@@ -110,14 +114,6 @@ const AppBar = styled(MuiAppBar, {
 		}),
 	}),
 }));
-
-const MediaTypeIconCollection = {
-	movies: <MovieOutline />,
-	music: <MusicBoxMultipleOutline />,
-	playlists: <PlaylistMusicOutline />,
-	tvshows: <Television />,
-	boxsets: <FolderOutline />,
-};
 
 export const Home = () => {
 	const [skeletonStateSideMenu, setSkeletonStateSideMenu] = useState(false);
@@ -131,6 +127,8 @@ export const Home = () => {
 
 	const [drawerState, setDrawerState] = useState(false);
 	const cookies = new Cookies();
+
+	const scrollTrigger = useScrollTrigger({ threshold: 5 });
 
 	const handleDrawerOpen = () => {
 		setDrawerState(true);
@@ -169,6 +167,7 @@ export const Home = () => {
 			userLibs(usr.data).then((libs) => {
 				setUserLibraries(libs.data.Items);
 				setSkeletonStateSideMenu(true);
+				// console.log(userLibraries);
 			});
 			getLatestMedia(usr.data).then((media) => {
 				setLatestMedia(media.data);
@@ -232,6 +231,7 @@ export const Home = () => {
 								position: "absolute",
 								top: "10%",
 								right: "5%",
+								opacity: drawerState ? 1 : 0,
 							}}
 						>
 							<Close />
@@ -267,7 +267,7 @@ export const Home = () => {
 												}}
 											>
 												{
-													MediaTypeIconCollection[
+													MediaCollectionTypeIconCollection[
 														library
 															.CollectionType
 													]
@@ -351,6 +351,7 @@ export const Home = () => {
 					>
 						{skeletonStateCarousel ? (
 							latestMedia.map((item, index) => {
+								// console.log(item);
 								return (
 									<Paper
 										className="hero-carousel-slide"
@@ -363,18 +364,34 @@ export const Home = () => {
 										}}
 										key={index}
 									>
-										<div
-											className="hero-carousel-background"
-											style={{
-												backgroundImage: `url(${
-													window.api
-														.basePath +
-													"/Items/" +
-													item.Id +
-													"/Images/Backdrop"
-												})`,
-											}}
-										></div>
+										<div className="hero-carousel-background-container">
+											{item.ImageBlurHashes
+												.Backdrop ? (
+												<div
+													className="hero-carousel-background-image"
+													style={{
+														backgroundImage: `url(${
+															window
+																.api
+																.basePath +
+															"/Items/" +
+															item.Id +
+															"/Images/Backdrop"
+														})`,
+													}}
+												></div>
+											) : (
+												<div className="hero-carousel-background-image empty"></div>
+											)}
+											<div className="hero-carousel-background-icon-container">
+												{
+													MediaTypeIconCollection[
+														item
+															.MediaType
+													]
+												}
+											</div>
+										</div>
 										<Box className="hero-carousel-detail">
 											<Typography
 												variant="h3"
@@ -435,6 +452,21 @@ export const Home = () => {
 							</Paper>
 						)}
 					</Carousel>
+
+					<Box>
+						{userLibraries.map((library, index) => {
+							console.log(library);
+							return (
+								<CardLandscape
+									key={index}
+									itemName={library.Name}
+									itemId={library.Id}
+									imageTags={library.imageTags}
+								></CardLandscape>
+							);
+						})}
+					</Box>
+
 					<Button variant="contained" onClick={handleLogout}>
 						Logout
 					</Button>
