@@ -32,7 +32,11 @@ export const AvatarCard = ({ userName, userId, userImageAvailable }) => {
 				</div>
 			</div>
 			<div className="card-text-container">
-				<Typography variant="button" color="textPrimary">
+				<Typography
+					variant="button"
+					color="textPrimary"
+					className="card-text"
+				>
 					{userName}
 				</Typography>
 			</div>

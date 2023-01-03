@@ -11,6 +11,8 @@ import EyeOffOutline from "mdi-material-ui/EyeOffOutline";
 import EyeOutline from "mdi-material-ui/EyeOutline";
 import ChevronRight from "mdi-material-ui/ChevronRight";
 
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import FormControl from "@mui/material/FormControl";
@@ -38,14 +40,6 @@ export const LoginWithImage = () => {
 	const [loading, setLoading] = useState(false);
 	const navigate = useNavigate();
 	const { enqueueSnackbar } = useSnackbar();
-	const cookies = new Cookies();
-
-	const currentServer = cookies.get("currentServer");
-	const serverList = cookies.get("servers");
-	let currentServerIp = "";
-	serverList.map((item, index) => {
-		currentServerIp = item[currentServer];
-	});
 
 	const handlePassword = (prop) => (event) => {
 		setPassword({
@@ -80,7 +74,7 @@ export const LoginWithImage = () => {
 		setLoading(true);
 		const user = await authUser();
 		sessionStorage.setItem("accessToken", user.data.AccessToken);
-		event.emit("set-api-accessToken", currentServerIp.serverAddress);
+		event.emit("set-api-accessToken", window.api.basePath);
 		// setAccessToken(user.data.AccessToken)
 		setLoading(false);
 		navigate(`/home`);
@@ -95,7 +89,7 @@ export const LoginWithImage = () => {
 				</Typography>
 				<Avatar
 					src={
-						currentServerIp.serverAddress +
+						window.api.basePath +
 						"/Users/" +
 						userId +
 						"/Images/Primary"
@@ -157,14 +151,12 @@ export const UserLogin = () => {
 
 	const currentServer = cookies.get("currentServer");
 	const serverList = cookies.get("servers");
-	let currentServerIp = "";
-	serverList.map((item, index) => {
-		currentServerIp = item[currentServer];
-		// console.log(item);
-	});
 
 	const handleChangeServer = () => {
 		navigate("/servers/list");
+	};
+	const handleManualLogin = () => {
+		navigate("/login/manual");
 	};
 	const getUsers = async () => {
 		const users = await getUserApi(window.api).getPublicUsers();
@@ -204,28 +196,6 @@ export const UserLogin = () => {
 										userImageAvailable={true}
 									></AvatarCard>
 								)}
-								{/* <Avatar
-									alt={item.Name}
-									src={
-										currentServerIp.serverAddress +
-										"/Users/" +
-										item.Id +
-										"/Images/Primary?tag=" +
-										item.PrimaryImageTag
-									}
-									className="userImage"
-									sx={{
-										width: 128,
-										height: 128,
-									}}
-								/>
-								<Typography
-									variant="button"
-									className="userName"
-									color="textPrimary"
-								>
-									{item.Name}
-								</Typography> */}
 							</Link>
 						);
 					})}
@@ -242,6 +212,7 @@ export const UserLogin = () => {
 					<Button
 						variant="contained"
 						className="userEventButton"
+						onClick={handleManualLogin}
 					>
 						Manual Login
 					</Button>
@@ -252,14 +223,131 @@ export const UserLogin = () => {
 };
 
 export const UserLoginManual = () => {
+	const [loading, setLoading] = useState(false);
+	const navigate = useNavigate();
+	const { enqueueSnackbar } = useSnackbar();
+
+	const [password, setPassword] = useState({
+		showpass: false,
+	});
+	const [userName, setUserName] = useState("");
+
+	const handleUsername = (event) => {
+		setUserName(event.target.value);
+	};
+
+	const handlePassword = (prop) => (event) => {
+		setPassword({
+			...password,
+			[prop]: event.target.value,
+		});
+	};
+
+	const handleShowPassword = () => {
+		setPassword({
+			...password,
+			showpass: !password.showpass,
+		});
+	};
+
+	const authUser = async () => {
+		try {
+			const auth = await api.authenticateUserByName(
+				userName,
+				password.password,
+			);
+			return auth;
+		} catch (error) {
+			enqueueSnackbar("Incorrect Username or Password!", {
+				variant: "error",
+			});
+			setLoading(false);
+			console.error(error);
+		}
+	};
+
+	const handleLogin = async () => {
+		setLoading(true);
+		const user = await authUser();
+		sessionStorage.setItem("accessToken", user.data.AccessToken);
+		event.emit("set-api-accessToken", window.api.basePath);
+		// setAccessToken(user.data.AccessToken)
+		setLoading(false);
+		navigate(`/home`);
+	};
+
 	return (
-		<>
-			<div className="centered">
-				{" "}
-				<h1>Hello There!</h1>
-				<h1>Your are a bit early</h1>
-				<h1>WIP Manual Login</h1>
-			</div>
-		</>
+		<Container maxWidth="xs" className="centered">
+			<Grid
+				container
+				spacing={2}
+				direction="column"
+				justifyContent="center"
+				alignItems="center"
+			>
+				<Grid item xl={5} md={6} sx={{ marginBottom: "1em" }}>
+					<Typography variant="h3" color="textPrimary">
+						Login
+					</Typography>
+				</Grid>
+				<Grid sx={{ width: "100%" }} item xl={5} md={6}>
+					<FormControl sx={{ width: "100%" }} variant="outlined">
+						<InputLabel htmlFor="user-name">
+							Username:
+						</InputLabel>
+						<OutlinedInput
+							id="user-name"
+							type="text"
+							variant="outlined"
+							label="Username:"
+							onChange={handleUsername}
+						/>
+					</FormControl>
+				</Grid>
+				<Grid sx={{ width: "100%" }} item xl={5} md={6}>
+					<FormControl sx={{ width: "100%" }} variant="outlined">
+						<InputLabel htmlFor="user-password">
+							Password:
+						</InputLabel>
+						<OutlinedInput
+							id="user-password"
+							type={
+								password.showpass ? "text" : "password"
+							}
+							variant="outlined"
+							onChange={handlePassword("password")}
+							label="Password:"
+							endAdornment={
+								<InputAdornment position="end">
+									<IconButton
+										onClick={handleShowPassword}
+										aria-label="toggle password visibility"
+									>
+										{password.showpass ? (
+											<EyeOffOutline />
+										) : (
+											<EyeOutline />
+										)}
+									</IconButton>
+								</InputAdornment>
+							}
+						/>
+					</FormControl>
+				</Grid>
+				<Grid item xl={5} md={6} sx={{ width: "100%" }}>
+					<LoadingButton
+						variant="contained"
+						endIcon={<ChevronRight />}
+						onClick={handleLogin}
+						loading={loading}
+						loadingPosition="end"
+						size="large"
+						sx={{ width: "100%" }}
+					>
+						Login
+					</LoadingButton>
+				</Grid>
+			</Grid>
+		</Container>
 	);
 };

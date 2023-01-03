@@ -1,5 +1,9 @@
 /** @format */
 
+.userCard {
+	text-decoration: none !important;
+}
+
 .card {
 	&.square {
 		width: fit-content;
@@ -25,5 +29,8 @@
 				background: $clr-accent-dark;
 			}
 		}
+	}
+	&-text {
+		text-decoration: none !important;
 	}
 }
