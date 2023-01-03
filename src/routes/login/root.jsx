@@ -46,7 +46,6 @@ export const LoginWithImage = () => {
 			...password,
 			[prop]: event.target.value,
 		});
-		console.log(password);
 	};
 
 	const handleShowPassword = () => {
