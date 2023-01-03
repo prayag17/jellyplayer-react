@@ -16,6 +16,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Button from "@mui/material/Button";
 import LinearProgress from "@mui/material/LinearProgress";
+import Container from "@mui/material/Container";
 import { useSnackbar } from "notistack";
 
 // Svgs
@@ -88,7 +89,7 @@ export const ServerList = () => {
 	}, []);
 	return (
 		<>
-			<div className="centered">
+			<Container maxWidth="md" className="centered">
 				<Typography color="textPrimary" variant="h3">
 					Select Server:
 				</Typography>
@@ -114,7 +115,7 @@ export const ServerList = () => {
 						);
 					})} */}
 				</div>
-			</div>
+			</Container>
 		</>
 	);
 };
@@ -190,7 +191,8 @@ export const ServerSetup = (props) => {
 		<>
 			{checkingServer && <LinearProgress />}
 			{isJfServer && <Navigate to="/login" />}
-			<div
+			<Container
+				maxWidth="md"
 				className={
 					checkingServer
 						? "centered serverContainer loading"
@@ -207,15 +209,17 @@ export const ServerSetup = (props) => {
 						setServerIp(event.target.value);
 					}}
 					helperText="Add your server adddress with https:// or http://"
+					sx={{ marginBottom: "1em" }}
 				></TextField>
 				<Button
-					className="button"
 					variant="contained"
+					sx={{ width: "100%" }}
+					size="large"
 					onClick={handleAddServer}
 				>
 					Add Server
 				</Button>
-			</div>
+			</Container>
 		</>
 	);
 };

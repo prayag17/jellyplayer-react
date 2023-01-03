@@ -88,7 +88,8 @@ const AnimationWrapper = () => {
 			animate="animate"
 			exit="exit"
 			transition={{
-				duration: 0.2,
+				duration: 0.3,
+				ease: "easeInOut",
 			}}
 		>
 			<Outlet />
@@ -167,7 +168,7 @@ function App() {
 	return (
 		<SnackbarProvider maxSnack={5}>
 			<ThemeProvider theme={theme}>
-				<AnimatePresence wait>
+				<AnimatePresence>
 					<Routes key={location.pathname} location={location}>
 						<Route element={<AnimationWrapper />}>
 							{/* Main Routes */}

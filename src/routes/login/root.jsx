@@ -25,6 +25,7 @@ import Button from "@mui/material/Button";
 import { useSnackbar } from "notistack";
 
 import { AvatarCard } from "../../components/avatar/avatar.jsx";
+import { AppBarBackOnly } from "../../components/appBar/backOnly.jsx";
 
 // import { jellyfin } from "../../jellyfin";
 // import getSystemApi from "@jellyfin/sdk";
@@ -81,7 +82,8 @@ export const LoginWithImage = () => {
 
 	return (
 		<>
-			<div className="centered">
+			<AppBarBackOnly />
+			<Container maxWidth="md" className="centered">
 				<Typography variant="h3" color="textPrimary">
 					Login as
 					<br />
@@ -138,7 +140,7 @@ export const LoginWithImage = () => {
 				>
 					Login
 				</LoadingButton>
-			</div>
+			</Container>
 		</>
 	);
 };
@@ -171,7 +173,8 @@ export const UserLogin = () => {
 
 	return (
 		<>
-			<div className="centered">
+			<AppBarBackOnly />
+			<Container maxWidth="md" className="centered">
 				<h1 color="white">WIP-user login</h1>
 				<div className="userList">
 					{userList.map((item, index) => {
@@ -216,7 +219,7 @@ export const UserLogin = () => {
 						Manual Login
 					</Button>
 				</div>
-			</div>
+			</Container>
 		</>
 	);
 };
@@ -276,77 +279,90 @@ export const UserLoginManual = () => {
 	};
 
 	return (
-		<Container maxWidth="xs" className="centered">
-			<Grid
-				container
-				spacing={2}
-				direction="column"
-				justifyContent="center"
-				alignItems="center"
-			>
-				<Grid item xl={5} md={6} sx={{ marginBottom: "1em" }}>
-					<Typography variant="h3" color="textPrimary">
-						Login
-					</Typography>
-				</Grid>
-				<Grid sx={{ width: "100%" }} item xl={5} md={6}>
-					<FormControl sx={{ width: "100%" }} variant="outlined">
-						<InputLabel htmlFor="user-name">
-							Username:
-						</InputLabel>
-						<OutlinedInput
-							id="user-name"
-							type="text"
+		<>
+			<AppBarBackOnly />
+			<Container maxWidth="xs" className="centered">
+				<Grid
+					container
+					spacing={2}
+					direction="column"
+					justifyContent="center"
+					alignItems="center"
+				>
+					<Grid item xl={5} md={6} sx={{ marginBottom: "1em" }}>
+						<Typography variant="h3" color="textPrimary">
+							Login
+						</Typography>
+					</Grid>
+					<Grid sx={{ width: "100%" }} item xl={5} md={6}>
+						<FormControl
+							sx={{ width: "100%" }}
 							variant="outlined"
-							label="Username:"
-							onChange={handleUsername}
-						/>
-					</FormControl>
-				</Grid>
-				<Grid sx={{ width: "100%" }} item xl={5} md={6}>
-					<FormControl sx={{ width: "100%" }} variant="outlined">
-						<InputLabel htmlFor="user-password">
-							Password:
-						</InputLabel>
-						<OutlinedInput
-							id="user-password"
-							type={
-								password.showpass ? "text" : "password"
-							}
+						>
+							<InputLabel htmlFor="user-name">
+								Username:
+							</InputLabel>
+							<OutlinedInput
+								id="user-name"
+								type="text"
+								variant="outlined"
+								label="Username:"
+								onChange={handleUsername}
+							/>
+						</FormControl>
+					</Grid>
+					<Grid sx={{ width: "100%" }} item xl={5} md={6}>
+						<FormControl
+							sx={{ width: "100%" }}
 							variant="outlined"
-							onChange={handlePassword("password")}
-							label="Password:"
-							endAdornment={
-								<InputAdornment position="end">
-									<IconButton
-										onClick={handleShowPassword}
-										aria-label="toggle password visibility"
-									>
-										{password.showpass ? (
-											<EyeOffOutline />
-										) : (
-											<EyeOutline />
-										)}
-									</IconButton>
-								</InputAdornment>
-							}
-						/>
-					</FormControl>
+						>
+							<InputLabel htmlFor="user-password">
+								Password:
+							</InputLabel>
+							<OutlinedInput
+								id="user-password"
+								type={
+									password.showpass
+										? "text"
+										: "password"
+								}
+								variant="outlined"
+								onChange={handlePassword("password")}
+								label="Password:"
+								endAdornment={
+									<InputAdornment position="end">
+										<IconButton
+											onClick={
+												handleShowPassword
+											}
+											aria-label="toggle password visibility"
+										>
+											{password.showpass ? (
+												<EyeOffOutline />
+											) : (
+												<EyeOutline />
+											)}
+										</IconButton>
+									</InputAdornment>
+								}
+							/>
+						</FormControl>
+					</Grid>
+					<Grid item xl={5} md={6} sx={{ width: "100%" }}>
+						<LoadingButton
+							variant="contained"
+							endIcon={<ChevronRight />}
+							onClick={handleLogin}
+							loading={loading}
+							loadingPosition="end"
+							size="large"
+							sx={{ width: "100%" }}
+						>
+							Login
+						</LoadingButton>
+					</Grid>
 				</Grid>
-				<Grid item xl={5} md={6} sx={{ width: "100%" }}>
-					<LoadingButton
-						variant="contained"
-						endIcon={<ChevronRight />}
-						onClick={handleLogin}
-						loading={loading}
-						loadingPosition="end"
-						size="large"
-						sx={{ width: "100%" }}
-					>
-						Login
-					</LoadingButton>
-				</Grid>
-			</Grid>
-		</Container>
+			</Container>
+		</>
 	);
 };
