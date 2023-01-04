@@ -24,7 +24,7 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import Button from "@mui/material/Button";
 import { useSnackbar } from "notistack";
 
-import { AvatarCard } from "../../components/avatar/avatar.jsx";
+import { AvatarCard, AvatarImage } from "../../components/avatar/avatar.jsx";
 import { AppBarBackOnly } from "../../components/appBar/backOnly.jsx";
 
 // import { jellyfin } from "../../jellyfin";
@@ -83,63 +83,83 @@ export const LoginWithImage = () => {
 	return (
 		<>
 			<AppBarBackOnly />
-			<Container maxWidth="md" className="centered">
-				<Typography variant="h3" color="textPrimary">
-					Login as
-					<br />
-				</Typography>
-				<Avatar
-					src={
-						window.api.basePath +
-						"/Users/" +
-						userId +
-						"/Images/Primary"
-					}
-					className="userImage"
-					sx={{
-						width: 128,
-						height: 128,
-					}}
-				/>
-				<Typography color="textPrimary" variant="h4">
-					{userName}
-				</Typography>
-				<br />
-				<FormControl variant="outlined">
-					<InputLabel htmlFor="user-password">
-						Password:
-					</InputLabel>
-					<OutlinedInput
-						id="user-password"
-						type={password.showpass ? "text" : "password"}
-						variant="outlined"
-						onChange={handlePassword("password")}
-						label="Password:"
-						endAdornment={
-							<InputAdornment position="end">
-								<IconButton
-									onClick={handleShowPassword}
-									aria-label="toggle password visibility"
-								>
-									{password.showpass ? (
-										<EyeOffOutline />
-									) : (
-										<EyeOutline />
-									)}
-								</IconButton>
-							</InputAdornment>
-						}
-					/>
-				</FormControl>
-				<LoadingButton
-					variant="contained"
-					endIcon={<ChevronRight />}
-					onClick={handleLogin}
-					loading={loading}
-					loadingPosition="end"
+			<Container maxWidth="xs" className="centered">
+				<Grid
+					container
+					direction="column"
+					justifyContent="center"
+					alignItems="center"
+					spacing={2}
 				>
-					Login
-				</LoadingButton>
+					<Grid item marginBottom={2}>
+						<Typography
+							textAlign="center"
+							variant="h3"
+							color="textPrimary"
+						>
+							Login
+							<br />
+						</Typography>
+					</Grid>
+					<Grid item>
+						<AvatarImage userId={userId} />
+						<Typography
+							color="textPrimary"
+							textAlign="center"
+							variant="h4"
+						>
+							{userName}
+						</Typography>
+					</Grid>
+					<Grid item minWidth="100%">
+						<br />
+						<FormControl variant="outlined" fullWidth>
+							<InputLabel htmlFor="user-password">
+								Password:
+							</InputLabel>
+							<OutlinedInput
+								id="user-password"
+								type={
+									password.showpass
+										? "text"
+										: "password"
+								}
+								variant="outlined"
+								onChange={handlePassword("password")}
+								label="Password:"
+								endAdornment={
+									<InputAdornment position="end">
+										<IconButton
+											onClick={
+												handleShowPassword
+											}
+											aria-label="toggle password visibility"
+										>
+											{password.showpass ? (
+												<EyeOffOutline />
+											) : (
+												<EyeOutline />
+											)}
+										</IconButton>
+									</InputAdornment>
+								}
+							/>
+						</FormControl>
+					</Grid>
+					<Grid item minWidth="100%">
+						<LoadingButton
+							variant="contained"
+							endIcon={<ChevronRight />}
+							onClick={handleLogin}
+							loading={loading}
+							loadingPosition="end"
+							size="large"
+							fullWidth
+						>
+							Login
+						</LoadingButton>
+					</Grid>
+				</Grid>
 			</Container>
 		</>
 	);
@@ -303,6 +323,7 @@ export const UserLoginManual = () => {
 								Username:
 							</InputLabel>
 							<OutlinedInput
+								fullWidth
 								id="user-name"
 								type="text"
 								variant="outlined"
@@ -320,6 +341,7 @@ export const UserLoginManual = () => {
 								Password:
 							</InputLabel>
 							<OutlinedInput
+								fullWidth
 								id="user-password"
 								type={
 									password.showpass

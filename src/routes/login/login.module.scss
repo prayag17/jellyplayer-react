@@ -11,11 +11,6 @@
 		flex-flow: column;
 		flex: 1 1 0px;
 	}
-	&Image {
-		aspect-ratio: 1;
-		width: 100%;
-		object-fit: cover;
-	}
 	&Icon {
 		font-size: 5em;
 		display: flex;

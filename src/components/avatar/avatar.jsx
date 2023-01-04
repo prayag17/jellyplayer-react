@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import Typography from "@mui/material/Typography";
 import ButtonBase from "@mui/material/ButtonBase";
 
-import AccountOutline from "mdi-material-ui/AccountOutline";
+import Account from "mdi-material-ui/Account";
 
 import "./avatar.module.scss";
 
@@ -28,7 +28,7 @@ export const AvatarCard = ({ userName, userId, userImageAvailable }) => {
 					<div className="card-image empty"></div>
 				)}
 				<div className="card-image-icon-container">
-					<AccountOutline className="card-image-icon" />
+					<Account className="card-image-icon" />
 				</div>
 			</div>
 			<div className="card-text-container">
@@ -44,8 +44,34 @@ export const AvatarCard = ({ userName, userId, userImageAvailable }) => {
 	);
 };
 
+export const AvatarImage = ({ userId }) => {
+	return (
+		<div className="avatar-image-container">
+			<div
+				className="avatar-image"
+				style={{
+					backgroundImage:
+						"url('" +
+						window.api.basePath +
+						"/Users/" +
+						userId +
+						"/Images/Primary')",
+				}}
+			></div>
+
+			<div className="avatar-image-icon-container">
+				<Account className="avatar-image-icon" />
+			</div>
+		</div>
+	);
+};
+
 AvatarCard.propType = {
 	userName: PropTypes.string.isRequired,
 	userId: PropTypes.string.isRequired,
 	userImageAvailable: PropTypes.bool.isRequired,
+};
+
+AvatarImage.propType = {
+	userId: PropTypes.string.isRequired,
 };
