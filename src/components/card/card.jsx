@@ -7,7 +7,9 @@ import Typography from "@mui/material/Typography";
 import {
 	MediaCollectionTypeIconCollection,
 	MediaTypeIconCollection,
-} from "./utils/iconsCollection";
+} from "../utils/iconsCollection";
+
+import "./card.module.scss";
 
 export const CardLandscape = ({ itemName, itemId, imageTags }) => {
 	const imageAvailable = () => {
@@ -23,7 +25,7 @@ export const CardLandscape = ({ itemName, itemId, imageTags }) => {
 	// const { name } = props;
 	// let imageAvailable = true;
 	return (
-		<div>
+		<div className="card">
 			{/* <img
 		className="card-image card-image-landscape"
 		src={props.src}

@@ -1,0 +1,12 @@
+/** @format */
+
+.card-scroller {
+	// height: 20em;
+	&-slide {
+		overflow: visible;
+		display: flex;
+	}
+	&-button {
+		color: white;
+	}
+}

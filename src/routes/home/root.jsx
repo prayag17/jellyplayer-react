@@ -2,10 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Cookies } from "react-cookie";
-import { useNavigate, useParams, Link, Await } from "react-router-dom";
-import { motion } from "framer-motion";
-
-import { EventEmitter as event } from "../../eventEmitter.js";
 
 import { theme } from "../../theme";
 import "./home.module.scss";
@@ -31,8 +27,8 @@ import useScrollTrigger from "@mui/material/useScrollTrigger";
 import Carousel from "react-material-ui-carousel";
 
 // Custom Components
-import { CardLandscape } from "../../components/card";
-
+import { CardLandscape } from "../../components/card/card";
+import { CardScroller } from "../../components/cardScroller/cardScroller";
 // Icons
 import {
 	MediaCollectionTypeIconCollection,
@@ -174,7 +170,10 @@ export const Home = () => {
 				setSkeletonStateCarousel(true);
 			});
 		});
-	});
+		for (let lib of userLibraries) {
+			console.table(lib);
+		}
+	}, []);
 
 	return (
 		<>
@@ -454,17 +453,18 @@ export const Home = () => {
 					</Carousel>
 
 					<Box>
-						{userLibraries.map((library, index) => {
-							console.log(library);
-							return (
-								<CardLandscape
-									key={index}
-									itemName={library.Name}
-									itemId={library.Id}
-									imageTags={library.imageTags}
-								></CardLandscape>
-							);
-						})}
+						<CardScroller>
+							{userLibraries.map((library, index) => {
+								return (
+									<CardLandscape
+										key={index}
+										itemName={library.Name}
+										itemId={library.Id}
+										imageTags={library.imageTags}
+									></CardLandscape>
+								);
+							})}
+						</CardScroller>
 					</Box>
 
 					<Button variant="contained" onClick={handleLogout}>
