@@ -4,25 +4,24 @@
 	text-decoration: none !important;
 }
 
-.card {
-	&.square {
-		width: fit-content;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		flex-direction: column;
-		gap: 0.5em;
-		margin-bottom: 0.5em;
-	}
-	&-image {
+.card.square {
+	width: fit-content;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	gap: 0.5em;
+	margin-bottom: 0.5em;
+	.card-image {
 		&-container {
 			font-size: 5em;
 		}
 		&-icon {
 			font-size: 1.5em !important;
 			&-container {
-				width: 1.5em;
-				height: 1.5em;
+				position: static;
+				width: 1.5em !important;
+				height: 1.5em !important;
 				aspect-ratio: 1;
 				border-radius: $border-radius-default;
 				color: $clr-accent-default;
@@ -30,7 +29,8 @@
 			}
 		}
 	}
-	&-text {
+	.card-text {
+		margin: 0 !important;
 		text-decoration: none !important;
 	}
 }

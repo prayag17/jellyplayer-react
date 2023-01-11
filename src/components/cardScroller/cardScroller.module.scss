@@ -8,5 +8,32 @@
 	}
 	&-button {
 		color: white;
+		position: absolute !important;
+		top: 50%;
+		transform: translateY(-50%);
+		background-color: transparent !important;
+		border-radius: 0 !important;
+		opacity: 0;
+		transition: opacity $transition-time-default !important;
+		&:hover,
+		&:focus {
+			opacity: 1;
+		}
+		&.right {
+			background: linear-gradient(
+				to left,
+				rgb(0 0 0 / 0.5),
+				transparent
+			);
+			right: 0%;
+		}
+		&.left {
+			background: linear-gradient(
+				to right,
+				rgb(0 0 0 / 0.5),
+				transparent
+			);
+			left: 0%;
+		}
 	}
 }

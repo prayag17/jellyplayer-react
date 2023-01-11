@@ -11,7 +11,7 @@ import { getSystemApi } from "@jellyfin/sdk/lib/utils/api/system-api";
 // MUI
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import List from "@mui/material/List";
+import Grid from "@mui/material/Grid";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Button from "@mui/material/Button";
@@ -199,26 +199,39 @@ export const ServerSetup = (props) => {
 						: "centered serverContainer"
 				}
 			>
-				<JellyplayerLogo className="logo" />
-				<TextField
-					className="textbox"
-					label="Server Address:"
-					variant="outlined"
-					// inputRef={serverIp}
-					onChange={(event) => {
-						setServerIp(event.target.value);
-					}}
-					helperText="Add your server adddress with https:// or http://"
-					sx={{ marginBottom: "1em" }}
-				></TextField>
-				<Button
-					variant="contained"
-					sx={{ width: "100%" }}
-					size="large"
-					onClick={handleAddServer}
+				<Grid
+					container
+					spacing={2}
+					direction="column"
+					justifyContent="center"
+					alignItems="center"
 				>
-					Add Server
-				</Button>
+					<Grid item xl={5} md={6} sx={{ marginBottom: "1em" }}>
+						<JellyplayerLogo className="logo" />
+					</Grid>
+					<Grid item xl={5} md={6} sx={{ width: "100%" }}>
+						<TextField
+							className="textbox"
+							label="Server Address:"
+							variant="outlined"
+							// inputRef={serverIp}
+							onChange={(event) => {
+								setServerIp(event.target.value);
+							}}
+							helperText="Add your server adddress with https:// or http://"
+						></TextField>
+					</Grid>
+					<Grid item xl={5} md={6} sx={{ width: "100%" }}>
+						<Button
+							variant="contained"
+							sx={{ width: "100%" }}
+							size="large"
+							onClick={handleAddServer}
+						>
+							Add Server
+						</Button>
+					</Grid>
+				</Grid>
 			</Container>
 		</>
 	);

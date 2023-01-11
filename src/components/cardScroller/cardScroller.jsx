@@ -9,31 +9,40 @@ import "react-multi-carousel/lib/styles.css";
 import ChevronLeft from "mdi-material-ui/ChevronLeft";
 import ChevronRight from "mdi-material-ui/ChevronRight";
 
-import IconButton from "@mui/material/IconButton";
+import { styled } from "@mui/material/styles";
+import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
 
 import "./cardScroller.module.scss";
 
-const SliderButtons = ({ next, previous, goToSlide, ...rest }) => {
-	const {
-		carouselState: { currentSlide },
-	} = rest;
+const CarouselButton = styled(Button)(() => ({
+	color: "white",
+	height: "100%",
+}));
+
+const SliderButtonRight = ({ onClick }) => {
 	return (
-		<div className="carousel-button-group">
-			{" "}
-			<IconButton
-				onClick={() => previous()}
-				className="card-scroller-button"
-			>
-				<ChevronLeft />
-			</IconButton>
-			<IconButton
-				onClick={() => next()}
-				className="card-scroller-button"
-			>
-				<ChevronRight />
-			</IconButton>
-		</div>
+		<CarouselButton
+			onClick={() => onClick()}
+			className="card-scroller-button right"
+			variant="text"
+			// color="primary"
+		>
+			<ChevronRight />
+		</CarouselButton>
+	);
+};
+
+const SliderButtonLeft = ({ onClick }) => {
+	return (
+		<CarouselButton
+			onClick={() => onClick()}
+			className="card-scroller-button left"
+			variant="text"
+			// color="primary"
+		>
+			<ChevronLeft />
+		</CarouselButton>
 	);
 };
 
@@ -63,25 +72,12 @@ export const CardScroller = ({ children, displayCards }) => {
 			swipeable={false}
 			draggable={false}
 			responsive={responsive}
-			arrows={false}
-			renderButtonGroupOutside={true}
-			customButtonGroup={<SliderButtons />}
+			arrows={true}
+			customRightArrow={<SliderButtonRight />}
+			customLeftArrow={<SliderButtonLeft />}
 			slidesToSlide={4}
 			className="card-scroller"
 		>
-			{/* <ButtonGroup className="card-scroller-button-container">
-				<IconButton className="card-scroller-button">
-					<ChevronLeft />
-				</IconButton>
-				
-			</ButtonGroup>
-			<div className="card-slider-container">
-				<div
-					className="card-scroller-slide"
-					ref={cardScrollerSlide}
-				>
-				</div>
-			</div> */}
 			{children}
 		</Carousel>
 	);

@@ -5,13 +5,13 @@ import PropTypes from "prop-types";
 import Typography from "@mui/material/Typography";
 
 import {
-	MediaCollectionTypeIconCollection,
+	MediaCollectionTypeIconCollectionCard,
 	MediaTypeIconCollection,
 } from "../utils/iconsCollection";
 
 import "./card.module.scss";
 
-export const CardLandscape = ({ itemName, itemId, imageTags }) => {
+export const CardLandscape = ({ itemName, itemId, imageTags, iconType }) => {
 	const imageAvailable = () => {
 		console.log(imageTags);
 		if (imageTags == undefined) {
@@ -46,6 +46,9 @@ export const CardLandscape = ({ itemName, itemId, imageTags }) => {
 				) : (
 					<div className="card-image empty"></div>
 				)}
+				<div className="card-image-icon-container">
+					{MediaCollectionTypeIconCollectionCard[iconType]}
+				</div>
 			</div>
 
 			<div className="card-text-container">
@@ -61,4 +64,5 @@ CardLandscape.propTypes = {
 	itemName: PropTypes.string.isRequired,
 	itemId: PropTypes.string.isRequired,
 	imageTags: PropTypes.object,
+	iconType: PropTypes.string.isRequired,
 };

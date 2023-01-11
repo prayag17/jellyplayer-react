@@ -452,7 +452,15 @@ export const Home = () => {
 						)}
 					</Carousel>
 
-					<Box>
+					<Box className="home-section">
+						<Typography
+							variant="h4"
+							color="textPrimary"
+							className="home-section-heading"
+						>
+							<div className="home-section-heading-decoration"></div>{" "}
+							Libraries
+						</Typography>
 						<CardScroller>
 							{userLibraries.map((library, index) => {
 								return (
@@ -461,6 +469,9 @@ export const Home = () => {
 										itemName={library.Name}
 										itemId={library.Id}
 										imageTags={library.imageTags}
+										iconType={
+											library.CollectionType
+										}
 									></CardLandscape>
 								);
 							})}

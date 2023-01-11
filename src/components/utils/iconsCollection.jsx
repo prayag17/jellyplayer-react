@@ -31,6 +31,21 @@ export const MediaCollectionTypeIconCollection = {
 	folder: <FolderOutline />,
 };
 
+export const MediaCollectionTypeIconCollectionCard = {
+	universal: <MultiMedia className="card-image-icon" />,
+	movies: <MovieOutline className="card-image-icon" />,
+	music: <MusicBoxMultipleOutline className="card-image-icon" />,
+	playlists: <PlaylistMusicOutline className="card-image-icon" />,
+	tvshows: <Television className="card-image-icon" />,
+	boxsets: <MovieOutline className="card-image-icon" />,
+	musicvideos: <FolderMusicOutline className="card-image-icon" />,
+	trailers: <Youtube className="card-image-icon" />,
+	books: <BookMultiple className="card-image-icon" />,
+	photos: <ImageMultiple className="card-image-icon" />,
+	livetv: <TelevisionClassic className="card-image-icon" />,
+	folder: <FolderOutline className="card-image-icon" />,
+};
+
 export const MediaTypeIconCollection = {
 	Video: <Filmstrip className="hero-carousel-background-icon" />,
 	Audio: <Microphone className="hero-carousel-background-icon" />,
