@@ -52,3 +52,10 @@ export const MediaTypeIconCollection = {
 	Photo: <Image className="hero-carousel-background-icon" />,
 	Book: <Book className="hero-carousel-background-icon" />,
 };
+
+export const MediaTypeIconCollectionCard = {
+	Video: <Filmstrip className="card-image-icon" />,
+	Audio: <Microphone className="card-image-icon" />,
+	Photo: <Image className="card-image-icon" />,
+	Book: <Book className="card-image-icon" />,
+};

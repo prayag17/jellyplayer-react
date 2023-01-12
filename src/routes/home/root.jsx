@@ -27,7 +27,7 @@ import useScrollTrigger from "@mui/material/useScrollTrigger";
 import Carousel from "react-material-ui-carousel";
 
 // Custom Components
-import { CardLandscape } from "../../components/card/card";
+import { CardLandscape, CardPotrait } from "../../components/card/card";
 import { CardScroller } from "../../components/cardScroller/cardScroller";
 // Icons
 import {
@@ -116,6 +116,7 @@ export const Home = () => {
 	const [skeletonStateCarousel, setSkeletonStateCarousel] = useState(false);
 
 	const [userLibraries, setUserLibraries] = useState([]);
+	const [latestMovies, setLatestMovies] = useState([]);
 	const [user, setUser] = useState({
 		Name: "",
 	});
@@ -153,6 +154,16 @@ export const Home = () => {
 		const media = await getUserLibraryApi(window.api).getLatestMedia({
 			userId: user.Id,
 			fields: "Overview",
+			enableUserData: true,
+		});
+		return media;
+	};
+	const getLatestMovies = async (user) => {
+		const media = await getUserLibraryApi(window.api).getLatestMedia({
+			userId: user.Id,
+			fields: ["PrimaryImageAspectRatio", "Overview"],
+			enableUserData: true,
+			includeItemTypes: ["Movie"],
 		});
 		return media;
 	};
@@ -169,9 +180,12 @@ export const Home = () => {
 				setLatestMedia(media.data);
 				setSkeletonStateCarousel(true);
 			});
+			getLatestMovies(usr.data).then((media) => {
+				setLatestMovies(media.data);
+			});
 		});
-		for (let lib of userLibraries) {
-			console.table(lib);
+		for (let lib of latestMovies) {
+			console.log(lib);
 		}
 	}, []);
 
@@ -461,7 +475,7 @@ export const Home = () => {
 							<div className="home-section-heading-decoration"></div>{" "}
 							Libraries
 						</Typography>
-						<CardScroller>
+						<CardScroller displayCards={4}>
 							{userLibraries.map((library, index) => {
 								return (
 									<CardLandscape
@@ -473,6 +487,30 @@ export const Home = () => {
 											library.CollectionType
 										}
 									></CardLandscape>
+								);
+							})}
+						</CardScroller>
+					</Box>
+
+					<Box className="home-section">
+						<Typography
+							variant="h4"
+							color="textPrimary"
+							className="home-section-heading"
+						>
+							<div className="home-section-heading-decoration"></div>{" "}
+							Latest Movies
+						</Typography>
+						<CardScroller displayCards={6}>
+							{latestMovies.map((movie, index) => {
+								return (
+									<CardPotrait
+										key={index}
+										itemName={movie.Name}
+										itemId={movie.Id}
+										imageTags={movie.imageTags}
+										iconType={movie.MediaType}
+									></CardPotrait>
 								);
 							})}
 						</CardScroller>

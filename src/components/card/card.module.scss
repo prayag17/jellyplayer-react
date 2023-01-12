@@ -3,15 +3,24 @@
 .card {
 	margin-right: 1em;
 
+	&.landscape {
+		--image-aspect-ratio: 1.77;
+	}
+
+	&.portrait {
+		--image-aspect-ratio: 0.65;
+	}
+
 	&-image {
 		position: relative;
 		z-index: 1;
+		border-radius: 10px;
+		aspect-ratio: var(--image-aspect-ratio);
+		background-size: cover;
+		background-position: center;
 		&-container {
 			position: relative;
 		}
-		border-radius: $border-radius-default;
-		aspect-ratio: 1.7;
-		background-size: contain;
 		&-icon {
 			font-size: 4.5em !important;
 

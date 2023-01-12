@@ -52,7 +52,7 @@ export const CardScroller = ({ children, displayCards }) => {
 	const responsive = {
 		desktop: {
 			breakpoint: { max: 3000, min: 1024 },
-			items: 4,
+			items: displayCards,
 			slidesToSlide: 3, // optional, default to 1.
 		},
 		tablet: {
@@ -81,4 +81,8 @@ export const CardScroller = ({ children, displayCards }) => {
 			{children}
 		</Carousel>
 	);
+};
+
+CardScroller.propTypes = {
+	displayCards: PropTypes.number.isRequired,
 };
